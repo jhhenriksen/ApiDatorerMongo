@@ -42,9 +42,9 @@ app.get('/', async (req, res) => {
 app.get('/:klass', async (req, res) => {
   try {
     let klass = req.params['klass']
-    console.log(klass)
+    //console.log(klass)
 
-    const database = db.getDb("gymnasiuem");
+    const database = db.getDb("gymnasium");
     const collection = database.collection('computers');
     const result = await collection.find({placement: klass
     }).toArray();
@@ -55,7 +55,28 @@ app.get('/:klass', async (req, res) => {
   }
 })
 
-//app.get('/')
+// söka på serialNumber
+app.get('/serial/:serial', async (req, res) => {
+  try {
+    let serial = req.params.serial
+    const database = db.getDb("gymnasium")
+    const collection = database.collection('computers')
+    const result = await collection.findOne({
+      serialNumber: serial
+    })
+
+  }
+  catch {
+
+  }
+  
+})
+
+
+//Post inkl 
+// klass
+// kommentar om dators skick
+//+  array för nuvarande användare [status: normal, verkstad, oanvändbar (kommentar)]
 
 // Start the server
 app.listen(port, () => {
