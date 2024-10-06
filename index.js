@@ -64,10 +64,10 @@ app.get('/serial/:serial', async (req, res) => {
     const result = await collection.findOne({
       serialNumber: serial
     })
-
-  }
-  catch {
-
+    res.json(result)
+  } catch (err){
+    console.error("Error fetching data:", err);
+    res.status(500).send("Error fetching data from the database");
   }
   
 })
