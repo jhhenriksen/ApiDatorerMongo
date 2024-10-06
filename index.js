@@ -45,7 +45,7 @@ app.get('/:klass', async (req, res) => {
     console.log(klass)
 
     const database = db.getDb("gymnasiuem");
-    const collection = database.collection('users');
+    const collection = database.collection('computers');
     const result = await collection.find({placement: klass
     }).toArray();
     res.json(result)
@@ -55,7 +55,7 @@ app.get('/:klass', async (req, res) => {
   }
 })
 
-app.get('/')
+//app.get('/')
 
 // Start the server
 app.listen(port, () => {
