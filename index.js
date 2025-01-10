@@ -38,6 +38,8 @@ app.get('/', async (req, res) => {
     res.status(500).send("Error fetching data from the database");
   }
 })
+
+//ToDo - lägg till Klass
 //Student-tabell söka på klass
 app.get('/:klass', async (req, res) => {
   try {
@@ -55,23 +57,68 @@ app.get('/:klass', async (req, res) => {
   }
 })
 
+
+
+// GET befintlig användare på id
+app.get('/student/:objectId', async (req, res) => {
+  try {
+    let objectId = req.params['objectId']
+    const database = db.getDb("gymnasium")
+    const collection = database.collection('users')
+    const query = {_id: new ObjectId(objectId)}
+    const result = await collection.findOne(query)
+    console.log(result)
+    res.json(result)
+
+  } catch (err){
+    console.error("Error fetching data:", err);
+    res.status(500).send("Error fetching data from the database");
+  }
+}) 
+
+
+
 // söka på serialNumber
 app.get('/serial/:serial', async (req, res) => {
   try {
-    let serial = req.params.serial
+    let serial = req.params['serial']
     const database = db.getDb("gymnasium")
     const collection = database.collection('computers')
     const result = await collection.findOne({
       serialNumber: serial
     })
+    console.log(result)
     res.json(result)
+
   } catch (err){
     console.error("Error fetching data:", err);
     res.status(500).send("Error fetching data from the database");
   }
-  
 })
 
+
+/*
+// Uppdatera på serialNumber
+app.PATCH('/update/:serial', async (req, res) => { //endast nya fält
+  try {
+    let serial = req.params['serial']
+    const database = db.getDb("gymnasium")
+    const collection = database.collection('computers')
+    const result = await collection.findOne({
+      serialNumber: serial
+    })
+    console.log(result)
+    res.json(result)
+
+  } catch (err){
+    console.error("Error fetching data:", err);
+    res.status(500).send("Error fetching data from the database");
+  }
+})
+*/
+app.post('/serial/', async (req, res) => {
+  let data = req
+})
 
 //Post inkl 
 // klass
