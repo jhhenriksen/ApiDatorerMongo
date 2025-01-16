@@ -1,12 +1,15 @@
 const dotenv = require('dotenv')
 const express = require('express');
 const db = require('./dbConnection');
+const { Timestamp, ObjectId } = require('bson');
+express.urlencoded({extended:true}) //Läsa data från formulär, "content type": application/x-www-form-urlencoded
 
 dotenv.config({path: './config.env'})
 //dotenv.config({ path: `${__dirname}/config.env` });
 
 const port = process.env.PORT;
 const app = express();
+app.use(express.json())
 
 
 // Middleware to connect to the database before handling requests
@@ -23,11 +26,23 @@ app.use(async (req, res, next) => {
   }
 });
 
-// Example GET route using the database connection
-app.get('/', async (req, res) => {
+//* * * * * * * * * * * * * * * * * * * * /
+// TEST
+//* * * * * * * * * * * * * * * * * * * * /
+
+app.get('/test',  (req, res) => {
+  res.json({resultat: "Servern fungerar!"})
+})
+
+
+//* * * * * * * * * * * * * * * * * * * * /
+// GET all users
+//* * * * * * * * * * * * * * * * * * * * /
+
+app.get('/users', async (req, res) => {
   try {
     const database = db.getDb("gymnasiuem");
-    const collection = database.collection('computers');
+    const collection = database.collection('users');
     
     // Example: Fetch all documents from the collection
     const result = await collection.find({}).toArray();
@@ -39,33 +54,16 @@ app.get('/', async (req, res) => {
   }
 })
 
-//ToDo - lägg till Klass
-//Student-tabell söka på klass
-app.get('/:klass', async (req, res) => {
-  try {
-    let klass = req.params['klass']
-    //console.log(klass)
-
-    const database = db.getDb("gymnasium");
-    const collection = database.collection('computers');
-    const result = await collection.find({placement: klass
-    }).toArray();
-    res.json(result)
-  } catch (err){
-    console.error("Error fetching data:", err);
-    res.status(500).send("Error fetching data from the database");
-  }
-})
-
-
-
-// GET befintlig användare på id
-app.get('/student/:objectId', async (req, res) => {
+//* * * * * * * * * * * * * * * * * * * * /
+// GET ONE user
+//* * * * * * * * * * * * * * * * * * * * /
+app.get('/users/:objectId', async (req, res) => {
   try {
     let objectId = req.params['objectId']
     const database = db.getDb("gymnasium")
     const collection = database.collection('users')
     const query = {_id: new ObjectId(objectId)}
+  
     const result = await collection.findOne(query)
     console.log(result)
     res.json(result)
@@ -76,10 +74,31 @@ app.get('/student/:objectId', async (req, res) => {
   }
 }) 
 
+//ToDo - lägg till Klass
+//Student-tabell söka på klass
+app.get('/users/:klass', async (req, res) => {
+  try {
+    let klass = req.params['klass']
+    console.log(klass)
+
+    const database = db.getDb("gymnasium");
+    const collection = database.collection('computers');
+    const result = await collection.find({placement: klass}).toArray();
+    res.json(result)
+  } catch (err){
+    console.error("Error fetching data:", err);
+    res.status(500).send("Error fetching data from the database");
+  }
+})
+
+
+
+
+
 
 
 // söka på serialNumber
-app.get('/serial/:serial', async (req, res) => {
+app.get('/computers/:serial', async (req, res) => {
   try {
     let serial = req.params['serial']
     const database = db.getDb("gymnasium")
@@ -87,7 +106,7 @@ app.get('/serial/:serial', async (req, res) => {
     const result = await collection.findOne({
       serialNumber: serial
     })
-    console.log(result)
+    //console.log(result)
     res.json(result)
 
   } catch (err){
@@ -99,7 +118,7 @@ app.get('/serial/:serial', async (req, res) => {
 
 /*
 // Uppdatera på serialNumber
-app.PATCH('/update/:serial', async (req, res) => { //endast nya fält
+app.PATCH('/computers/:serial', async (req, res) => { //endast nya fält
   try {
     let serial = req.params['serial']
     const database = db.getDb("gymnasium")
@@ -124,6 +143,110 @@ app.post('/serial/', async (req, res) => {
 // klass
 // kommentar om dators skick
 //+  array för nuvarande användare [status: normal, verkstad, oanvändbar (kommentar)]
+
+
+
+//**************************** */
+//*   Create User
+//**************************** */
+
+app.post('/user', async (req, res) => {
+  
+  //Datum
+   myDate = new Date();
+   var myDateString = myDate.toISOString();
+
+   //hämta data i req.body
+   const isActive         = req.body.isActive
+   const firstName        = req.body.firstName;
+   const lastName         = req.body.lastName;
+   const role             = req.body.role;
+   const group            = req.body.group;
+   const action           = req.body.action;
+   const comment          = req.body.comment;
+   const currentComputer  = req.body.currentComputer;
+ 
+   try {
+     const database       = db.getDb("gymnasium");
+     const collection     = database.collection('users');
+     const result = await collection.insertOne({
+       isActive:  isActive,
+       firstName: firstName,
+       lastName:  lastName,
+       role:      role,
+       group:     group,   
+       history: [{
+         action:          action,
+         comment:         comment,
+         currentComputer: currentComputer,
+         createdAt:       myDateString
+       }]
+         
+       
+     });
+ 
+     res.json(result);
+   } catch (err) {
+     console.error("Error inserting data:", err);
+     res.status(500).send("Error inserting data to the database");
+   }
+   
+ })
+
+// UPPDATERA HISTORIK
+app.patch('/user/:userId', async (req, res) => {
+
+  //Datum
+  myDate = new Date();
+  var myDateString = myDate.toISOString();
+
+  const userId              = req.params.userId
+  console.log(userId)
+  
+  const currentComputer     = req.body.currentComputer
+  const action              = req.body.action
+  const comment             = req.body.comment
+  const query = {_id: new ObjectId(userId)}
+  
+  const update = {
+    $push: {
+      history: {
+          action:          action,
+          comment:         comment,
+          currentComputer: currentComputer,
+          createdAt:       myDateString
+      }
+    }
+  }
+  const options = {upsert: true}
+
+
+  try {
+    const database = db.getDb("gymnasium")
+    const collection = database.collection('users')
+    console.log(query)
+    console.log(update)
+    console.log(options)
+    
+    const result = await collection.updateOne(query,update, options)
+    console.log(result)
+    
+    res.json(result)
+    
+  }
+  catch (err){
+    console.error("Error fetching data:", err);
+    res.status(500).send("Error fetching data from the database");
+  }
+  
+})
+
+
+
+
+
+
+
 
 // Start the server
 app.listen(port, () => {
