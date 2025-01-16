@@ -194,7 +194,7 @@ app.post('/user', async (req, res) => {
  })
 
 // UPPDATERA HISTORIK
-app.patch('/user/:userId', async (req, res) => {
+app.patch('/users/:userId', async (req, res) => {
 
   //Datum
   myDate = new Date();
