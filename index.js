@@ -206,6 +206,7 @@ app.patch('/users/:userId', async (req, res) => {
   const currentComputer     = req.body.currentComputer
   const action              = req.body.action
   const comment             = req.body.comment
+  
   const query = {_id: new ObjectId(userId)}
   
   const update = {
