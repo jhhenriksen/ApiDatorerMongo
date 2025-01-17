@@ -39,7 +39,7 @@ app.get('/test',  (req, res) => {
 // GET all users
 //* * * * * * * * * * * * * * * * * * * * /
 
-app.get('/users', async (req, res) => {
+app.get('/user', async (req, res) => {
   try {
     const database = db.getDb("gymnasiuem");
     const collection = database.collection('users');
@@ -57,7 +57,7 @@ app.get('/users', async (req, res) => {
 //* * * * * * * * * * * * * * * * * * * * /
 // GET ONE user
 //* * * * * * * * * * * * * * * * * * * * /
-app.get('/users/:objectId', async (req, res) => {
+app.get('/user/:objectId', async (req, res) => {
   try {
     let objectId = req.params['objectId']
     const database = db.getDb("gymnasium")
@@ -76,7 +76,7 @@ app.get('/users/:objectId', async (req, res) => {
 
 //ToDo - lägg till Klass
 //Student-tabell söka på klass
-app.get('/users/:klass', async (req, res) => {
+app.get('/user/:klass', async (req, res) => {
   try {
     let klass = req.params['klass']
     console.log(klass)
@@ -194,7 +194,7 @@ app.post('/user', async (req, res) => {
  })
 
 // UPPDATERA HISTORIK
-app.patch('/users/:userId', async (req, res) => {
+app.patch('/user/:userId', async (req, res) => {
 
   //Datum
   myDate = new Date();
