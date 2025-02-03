@@ -64,7 +64,9 @@ app.get('/user/:objectId', async (req, res) => {
     const collection = database.collection('users')
     const query = {_id: new ObjectId(objectId)}
   
-    const result = await collection.findOne(query)
+    //findOne({}, null, { sort: { timestamp: -1} })
+
+    const result = await collection.findOne(query,null, { sort: { timestamp: -1} })
     console.log(result)
     res.json(result)
 
@@ -243,7 +245,7 @@ app.patch('/user/:userId', async (req, res) => {
 })
 
 
-
+//Hello
 
 
 
