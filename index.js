@@ -94,7 +94,19 @@ app.get('/user/:klass', async (req, res) => {
 })
 
 
+// GET CPMPUTERS
+app.get('/computers', async (req, res) => {
+  try {
+    const database = db.getDb("gymnasium")
+    const collection = database.collection('computers')
+    const result = await collection.find({}).toArray();
 
+    res.json(result)
+  } catch (err) {
+    console.error("Error fetching data:", err);
+    res.status(500).send("Error fetching data from the database");
+  }
+}) 
 
 
 
@@ -151,7 +163,7 @@ app.post('/serial/', async (req, res) => {
 //**************************** */
 //*   Create User
 //**************************** */
-
+/*
 app.post('/user', async (req, res) => {
   
   //Datum
@@ -194,6 +206,53 @@ app.post('/user', async (req, res) => {
    }
    
  })
+*/
+
+//Skapa användare och initiera userlog 
+app.post('/user', async (req, res) => {
+  //Datum
+  myDate = new Date();
+  myDateString = myDate.toISOString()
+
+  //hämta data i req.body
+  const isActive         = req.body.isActive
+  const firstName        = req.body.firstName;
+  const lastName         = req.body.lastName;
+  const role             = req.body.role;
+  const group            = req.body.group;
+  const action           = req.body.action;
+  const comment          = req.body.comment;
+  const currentComputer  = req.body.currentComputer;
+
+  try {
+    const database       = db.getDb("gymnasium");
+    const collection     = database.collection('users');
+    const result = await collection.insertOne({
+
+      isActive:         isActive,
+      firstName:        firstName,
+      lastName:         lastName,
+      role:             role,
+      group:            group,   
+      currentComputer:  currentComputer,
+      createdAt:        myDateString
+
+    });
+
+    res.json(result);
+  } catch (err) {
+    console.error("Error inserting data:", err);
+    res.status(500).send("Error inserting data to the database");
+  }
+
+})
+
+
+
+
+
+
+
 
 // UPPDATERA HISTORIK
 app.patch('/user/:userId', async (req, res) => {
